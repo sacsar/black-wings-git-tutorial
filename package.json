@@ -1,14 +1,25 @@
 {
     "scripts": {
-        "start": "mdx-deck deck.mdx"
+        "start": "mdx-deck deck.mdx",
+        "build": "gatsby build --prefix-paths && mv public dist",
+        "publish": "gh-pages -d dist",
+        "clean": "gatsby clean",
+        "serve": "light-server -s dist --servePrefix /black-wings-git-tutorial"
     },
     "devDependencies": {
-        "mdx-deck": "^4.1.1"
+        "@babel/preset-env": "^7.12.13",
+        "@babel/preset-react": "^7.12.13",
+        "babel-preset-gatsby": "^0.12.1",
+        "gatsby": "^2.32.3",
+        "gatsby-plugin-compile-es6-packages": "^2.1.0",
+        "gatsby-theme-mdx-deck": "^4.1.0",
+        "gh-pages": "^3.1.0",
+        "light-server": "^2.9.1",
+        "mdx-deck": "^4.1.1",
+        "prettier": "^2.2.1",
+        "website-pdf": "^4.1.0"
     },
     "dependencies": {
-        "@gitgraph/react": "^1.5.4",
-        "bootstrap": "^4.6.0",
-        "react-bootstrap": "^1.4.3",
-        "website-pdf": "^4.1.0"
+        "@gitgraph/react": "^1.5.4"
     }
 }
