@@ -1,0 +1,298 @@
+import commit from './images/commit.png';
+import status from './images/status.png';
+import conflict from './images/conflict.png';
+import git_log from './images/git_log.png';
+import status_with_change from './images/status_with_change.png'
+import DefaultLayout from './components/default-layout'
+import { FullScreenCode } from 'mdx-deck'
+import { FFMergeBefore, FFMergeAfter, MergeBefore, MergeAfter } from './components/graphs'
+import { Split } from 'mdx-deck'
+import { TwoColumn, Column } from './components/two-column'
+import ImageText from './components/image-text'
+
+# Introduction To Git
+
+Sebastian Csar
+
+---
+
+# What and Why Version Control?
+
+- Keep track of changes to the code
+- Revert bad changes
+- Allow multiple people to work in parallel more easily
+- Git is but one of many *distributed* version control systems
+    - Mercurial
+    - svn
+
+---
+
+# Key Definitions
+- **Repository** - a git "project"
+    - has all the *current* files
+    - but also all the *history*
+- <b>Branch</b> - a split from the "main line" so you can make changes without messing with the main line
+- <b>main/master</b> - (by convention) the name for the "main line" branch
+
+---
+
+- **commit** (n./v.) - a unit of change/the act of making that change
+- **merge** - bringing the changes from one branch into another
+- **rebase** - relocating where a branch splits from its parent
+
+---
+
+## Branches
+- `git checkout <id>` moves `HEAD` to `<id>` (which can be a branch name, a commit hash, a tag, ...)
+- creating a branch: `git checkout -b <branch name>`
+    - short for `git branch <branch name>` + `git checkout <branch name>`
+
+---
+
+## Making a commit.
+
+<Image src={status} style={{maxWidth: '75%', maxHeight: '75%', objectFit: 'contain', backgroundSize: 'contain'}} alt='foo'/>
+
+
+<ImageText>
+
+```
+ ~/dotfiles   setup_scripts  git status
+ On branch setup_scripts
+ Your branch is up to date with 'origin/setup_scripts'.
+
+ Untracked files:
+   (use "git add <file>..." to include in what will be committed)
+           git_aliases/
+                   nvim/.config/nvim/.netrwhist
+
+                   nothing added to commit but untracked files present (use "git add" to track)
+```
+
+</ImageText>
+
+--- 
+## Making a commit
+
+- `git status`: see what files have changed
+- `git add`: stage each file that you want to commit
+    - tip: `git add -p my_file.py` will show you all changes individually and ask if you want to stage them
+- `git commit`: make the commit
+    - shortcut: `git commit -m "The commit message"`
+
+---
+# commit
+
+<Image src={commit} style={{maxWith: '75%', maxHeight: '75%', backgroundSize: 'contain'}}/>
+
+<ImageText>
+
+```
+Add .vscode to .gitignore
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch setup_scripts
+# Your branch is up to date with 'origin/setup_scripts'.
+#
+# Changes to be committed:
+#       new file:   .gitignore
+#
+# Untracked files:
+#       git_aliases/
+#
+```
+
+</ImageText>
+
+---
+# A quick vim digression
+
+- git tends to default to using vim as its editor for commit messages
+- To commit:
+    - `i` (enter insert mode)
+    - write your commit message
+    - `<esc>` (back to command mode)
+    - `:w` (save)
+    - `:q` (quit)
+- To set a different editor:
+```
+git config --global core.editor nano
+```
+---
+
+# What about merging?
+Merge the branch featureA into main:
+
+```
+git checkout main # make sure you're in main to start
+git merge featureA
+```
+
+There are two scenarios:
+<ul>
+    <li>a fast-forward merge--your commits stack on top of the main branch</li>
+    <li>a three-way merge</li>
+</ul>
+
+---
+
+
+# Fast-Forward Merges
+
+<TwoColumn>
+
+<Column>
+
+## before
+
+<FFMergeBefore/>
+
+<ImageText>
+We have two branches: `main` and `some_branch`. There are three commits on
+`main` before `some branch` splits off and makes two commits with messages
+"start doing something" and "finish it up"
+</ImageText>
+
+</Column>
+
+<Column>
+
+## after
+
+<FFMergeAfter/>
+
+<ImageText>
+We merge `some_branch` into `main`. `some_branch` no longer exists and `main` is
+the only branch in the image. It contains the same three commits it did before,
+_plus_ the two from `some_branch`.
+</ImageText>
+
+</Column>
+</TwoColumn>
+
+---
+
+# Three-Way Merges
+
+<TwoColumn>
+    <Column>
+
+## before
+
+<MergeBefore/>
+<ImageText>
+In this example, we again have `some_branch` and `main` which diverge after
+three commits. We have the same two commits on `some_branch`: "start doing
+something" and "finish it up". However, `main` also has an additional commit
+with message "main advances" _after_ `some_branch` split off.
+</ImageText>
+</Column>
+<Column>
+
+## after
+
+<MergeAfter/>
+<ImageText>
+We again merge `some_branch` into `main`. Both `some_graph` and `main` remain in
+the image. The tip of `main` is now at the "merge commit"--a commit created by
+git with message "Merge branch some_branch".
+</ImageText>
+</Column>
+</TwoColumn>
+
+---
+
+# Merge Conflicts
+
+```
+$ git diff main setup_scripts --name-only
+.gitignore
+setup.sh
+$ git diff main conflict_demo --name-only
+.gitignore
+setup.sh
+```
+
+What happens when I try to merge setup_scripts into conflict_demo?<br/>
+
+<Image src={conflict} style={{maxWidth:'75%', backgroundSize: 'contain'}}/>
+
+<ImageText>
+
+```
+ ~/dotfiles   conflict_demo  git merge setup_scripts
+ CONFLICT (add/add): Merge conflict in setup.sh
+ Auto-merging setup.sh
+ Automatic merge failed; fix conflicts and then commit the result.
+```
+
+</ImageText>
+
+---
+
+<DefaultLayout>
+
+```
+<<<<<<< HEAD
+# first, let's start by installing stow
+
+sudo apt-get install stow
+
+# get nvim
+mkdir -p $HOME/bin
+cd $HOME/bin
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+chmod u+x nvim.appimage
+=======
+#!/usr/bin/env bash
+
+if ! command stow &> /dev/null
+then
+echo "Stow not found -- go download it from http://ftpmirror.gnu.org/stow/"
+exit
+fi
+
+# install vimplug for nvim
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+>>>>>>> setup_scripts
+```
+
+</DefaultLayout>
+
+---
+
+# Resolving Conflicts
+
+For each conflicted file:
+- open the file and edit it, taking the lines from the version you want
+    - caution: they may mix together in a way that results in broken code
+- stage the file (`git add`)
+Then, when you're done, `git commit`.
+
+---
+
+# More on confilcts...
+<ul>
+    <li>Editors often have a merge tool built to help</li>
+    <li>Github also allows you to resolve conflicts in the pull-request UI</li>
+</ul>
+
+---
+
+# .gitignore
+
+- There's a special file called `.gitignore` which contains a list of files/directories that you want git to ignore
+- These are usually things like files generated by your text editor/IDE or generated code
+- Github will offer to make one for you or you can google for a "standard" list for the language you're using
+
+---
+
+# Links and References
+
+- [Github Git Guide](https://guides.github.com/introduction/git-handbook/)
+- [git - the simple guide](https://rogerdudler.github.io/git-guide/) -- with [cheatsheet](https://rogerdudler.github.io/git-guide/files/git_cheat_sheet.pdf)
+- [official tutorial](https://git-scm.com/docs/gittutorial)
+- [MIT 6.005 tutorial on editor settings](https://web.mit.edu/6.005/www/fa14/tutorial/git/config.html)

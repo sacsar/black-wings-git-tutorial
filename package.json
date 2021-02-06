@@ -1,0 +1,14 @@
+{
+    "scripts": {
+        "start": "mdx-deck deck.mdx"
+    },
+    "devDependencies": {
+        "mdx-deck": "^4.1.1"
+    },
+    "dependencies": {
+        "@gitgraph/react": "^1.5.4",
+        "bootstrap": "^4.6.0",
+        "react-bootstrap": "^1.4.3",
+        "website-pdf": "^4.1.0"
+    }
+}
